@@ -1,0 +1,6 @@
+[package]
+name = "simpleloglist"
+version = "0.1.0"
+authors = ["Mike Schwörer <mailport@mikescher.de>"]
+
+[dependencies]
