@@ -1,0 +1,19 @@
+{
+	"build_systems":
+	[
+		{
+			"cmd":
+			[
+				"cargo fmt -- --force --write-mode=overwrite && cargo run -- list"
+			],
+			"name": "Run with args",
+			"shell": true
+		}
+	],
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	]
+}
