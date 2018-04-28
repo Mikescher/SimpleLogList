@@ -1,5 +1,7 @@
 use std::env;
 use std::fs;
+use std::fs::File;
+use std::io::prelude::*;
 use std::error::Error;
 use std::time::UNIX_EPOCH;
 
@@ -20,7 +22,16 @@ fn main() {
     if cmd == "list" {
         list_log_files()
     } else if cmd == "read" {
-        panic!("Not implemented");
+
+        if args.len() < 3 {
+            println!("read needs a path supplied");
+
+            std::process::exit(0);
+        }
+
+        let path: Vec<_> = args[2].split("/").map(|p| String::from(p)).collect();
+        read_log_file(String::from(BASE_DIR), path.as_slice());
+
     }
 
 }
@@ -34,6 +45,70 @@ fn list_log_files() {
     println!("}}");
 
     std::process::exit(0);
+}
+
+fn read_log_file(basepath: String, path: &[String]) {
+
+    if path.len() == 0 {
+        print!("Error: path is empty");
+        return;
+    }
+
+    let dir_iterator = match fs::read_dir(&basepath) {
+        Ok(p) => p,
+        Err(_) => {
+            print!("Could not read path: {}", basepath);
+            return;
+        }
+    };
+
+    let dir_entries: Vec<_> = dir_iterator.collect();
+
+    for i in 0..dir_entries.len() {
+
+        let dir_entry = &dir_entries[i].as_ref().unwrap();
+        let filetype = dir_entry.file_type().unwrap();
+        let filename = dir_entry.file_name().into_string().unwrap();
+
+        if filetype.is_dir() {
+
+            if path.len() > 1 && filename == path[0] {
+
+                read_log_file(basepath + &filename + "/", &path[1..]);
+                return;
+
+            }
+
+        } else if filetype.is_file() {
+
+            if path.len() == 1 && filename == path[0] {
+
+
+                let fullpath = basepath + &filename;
+                let mut f = match File::open(&fullpath) {
+                    Ok(p) => p,
+                    Err(_) => {
+                        println!("file not found: {}", &fullpath);
+                        return;
+                    }
+                };
+
+                let mut contents = String::new();
+                f.read_to_string(&mut contents).expect(&format!(
+                    "Could not read file: {}",
+                    &fullpath
+                ));
+
+                println!("{}", contents);
+                return;
+
+            }
+
+        }
+    }
+
+    println!("File not found in filesystem enumeration");
+    return;
 }
 
 fn list_dir_entries(p: &str, depth: i32) {
