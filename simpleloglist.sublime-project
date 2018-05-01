@@ -12,7 +12,7 @@
 		{
 			"cmd":
 			[
-				"cargo fmt -- --force --write-mode=overwrite && cargo run -- read \"pamac.log\""
+				"cargo fmt -- --force --write-mode=overwrite && cargo run -- read \"pack_2018-05-01.tar.gz/comic_downloader_2018-04-01.log\""
 			],
 			"name": "Run with args (read)",
 			"shell": true
